@@ -40,6 +40,7 @@ export interface MCPCommand {
   timestamp: number;
   response?: string;
   status: 'pending' | 'success' | 'error';
+  actions?: any[];
 }
 
 export interface PraxisLiveSocketConnection {

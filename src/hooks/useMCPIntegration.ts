@@ -1,9 +1,45 @@
 import { useState, useCallback } from 'react';
-import { MCPCommand } from '../types/multimedia';
+import { MCPCommand, AudioTrack, VideoTrack, PraxisLiveNode } from '../types/multimedia';
+import { llmService, MultimediaAction } from '../services/llmService';
 
-export const useMCPIntegration = () => {
+interface MCPIntegrationProps {
+  audioTracks: AudioTrack[];
+  videoTracks: VideoTrack[];
+  nodes: PraxisLiveNode[];
+  onAudioUpdate: (trackId: string, updates: Partial<AudioTrack>) => void;
+  onVideoUpdate: (trackId: string, updates: Partial<VideoTrack>) => void;
+  onNodeUpdate: (nodeAddress: string, propertyId: string, value: any) => void;
+}
+
+export const useMCPIntegration = (props?: MCPIntegrationProps) => {
   const [commands, setCommands] = useState<MCPCommand[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
+
+  const executeActions = useCallback((actions: MultimediaAction[]) => {
+    if (!props) return;
+
+    actions.forEach(action => {
+      switch (action.type) {
+        case 'audio':
+          const audioUpdate: Partial<AudioTrack> = {
+            [action.property]: action.value
+          };
+          props.onAudioUpdate(action.target, audioUpdate);
+          break;
+
+        case 'video':
+          const videoUpdate: Partial<VideoTrack> = {
+            [action.property]: action.value
+          };
+          props.onVideoUpdate(action.target, videoUpdate);
+          break;
+
+        case 'node':
+          props.onNodeUpdate(action.target, action.property, action.value);
+          break;
+      }
+    });
+  }, [props]);
 
   const sendMCPCommand = useCallback(async (command: string) => {
     const mcpCommand: MCPCommand = {
@@ -17,31 +53,61 @@ export const useMCPIntegration = () => {
     setIsProcessing(true);
 
     try {
-      // Simulate MCP server communication
-      // In a real implementation, this would connect to your MCP server
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const context = {
+        audioTracks: props?.audioTracks || [],
+        videoTracks: props?.videoTracks || [],
+        nodes: props?.nodes || []
+      };
+
+      const response = await llmService.processCommand(command, context);
       
-      const response = `Processed: ${command}`;
-      
-      setCommands(prev => 
-        prev.map(cmd => 
-          cmd.id === mcpCommand.id 
-            ? { ...cmd, response, status: 'success' as const }
-            : cmd
-        )
-      );
+      if (response.success) {
+        // Execute any actions returned by the LLM
+        if (response.actions && response.actions.length > 0) {
+          executeActions(response.actions);
+        }
+
+        setCommands(prev => 
+          prev.map(cmd => 
+            cmd.id === mcpCommand.id 
+              ? { 
+                  ...cmd, 
+                  response: response.message,
+                  status: 'success' as const,
+                  actions: response.actions
+                }
+              : cmd
+          )
+        );
+      } else {
+        setCommands(prev => 
+          prev.map(cmd => 
+            cmd.id === mcpCommand.id 
+              ? { 
+                  ...cmd, 
+                  response: response.message || 'Error processing command',
+                  status: 'error' as const
+                }
+              : cmd
+          )
+        );
+      }
     } catch (error) {
       setCommands(prev => 
         prev.map(cmd => 
           cmd.id === mcpCommand.id 
-            ? { ...cmd, response: 'Error processing command', status: 'error' as const }
+            ? { 
+                ...cmd, 
+                response: 'Error processing command: ' + (error instanceof Error ? error.message : 'Unknown error'),
+                status: 'error' as const
+              }
             : cmd
         )
       );
     } finally {
       setIsProcessing(false);
     }
-  }, []);
+  }, [props, executeActions]);
 
   const clearCommands = useCallback(() => {
     setCommands([]);

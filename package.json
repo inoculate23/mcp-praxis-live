@@ -14,7 +14,8 @@
     "react-dom": "^18.2.0",
     "lucide-react": "^0.263.1",
     "framer-motion": "^10.16.4",
-    "@types/web": "^0.0.99"
+    "@types/web": "^0.0.99",
+    "openai": "^4.20.1"
   },
   "devDependencies": {
     "@types/react": "^18.2.15",

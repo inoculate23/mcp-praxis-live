@@ -116,7 +116,7 @@ function App() {
             Praxis-Live Multimedia Control Center
           </h1>
           <p className="text-gray-400">
-            AI-powered audio and video processing with MCP integration
+            AI-powered audio and video processing with intelligent control
           </p>
           {!connection.connected && (
             <div className="mt-2 p-3 bg-yellow-900/50 border border-yellow-600 rounded-lg">
@@ -209,7 +209,14 @@ function App() {
             )}
             {activeTab === 'ai' && (
               <div className="h-[600px]">
-                <MCPChat />
+                <MCPChat
+                  audioTracks={audioTracks}
+                  videoTracks={videoTracks}
+                  nodes={nodes}
+                  onAudioUpdate={handleAudioTrackUpdate}
+                  onVideoUpdate={handleVideoTrackUpdate}
+                  onNodeUpdate={handleNodePropertyUpdate}
+                />
               </div>
             )}
           </div>
@@ -218,7 +225,14 @@ function App() {
           <div className="space-y-6">
             {activeTab !== 'ai' && (
               <div className="h-[400px]">
-                <MCPChat />
+                <MCPChat
+                  audioTracks={audioTracks}
+                  videoTracks={videoTracks}
+                  nodes={nodes}
+                  onAudioUpdate={handleAudioTrackUpdate}
+                  onVideoUpdate={handleVideoTrackUpdate}
+                  onNodeUpdate={handleNodePropertyUpdate}
+                />
               </div>
             )}
             
@@ -244,6 +258,12 @@ function App() {
                   <span className="text-gray-400">Connection:</span>
                   <span className={connection.connected ? 'text-green-400' : 'text-red-400'}>
                     {connection.connected ? 'Active' : 'Demo Mode'}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-400">AI Status:</span>
+                  <span className={import.meta.env.VITE_OPENAI_API_KEY ? 'text-green-400' : 'text-yellow-400'}>
+                    {import.meta.env.VITE_OPENAI_API_KEY ? 'Connected' : 'Demo Mode'}
                   </span>
                 </div>
               </div>
