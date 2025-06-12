@@ -63,6 +63,40 @@
     transform: scale(1.1);
     box-shadow: 0 4px 12px rgba(59, 130, 246, 0.5);
   }
+
+  .slider-progress::-webkit-slider-track {
+    background: #4b5563;
+    border-radius: 0.25rem;
+    height: 4px;
+  }
+  
+  .slider-progress::-webkit-slider-thumb {
+    appearance: none;
+    height: 16px;
+    width: 16px;
+    border-radius: 50%;
+    background: #3b82f6;
+    cursor: pointer;
+    border: 2px solid #1e40af;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  }
+  
+  .slider-progress::-moz-range-track {
+    background: #4b5563;
+    border-radius: 0.25rem;
+    height: 4px;
+    border: none;
+  }
+  
+  .slider-progress::-moz-range-thumb {
+    height: 16px;
+    width: 16px;
+    border-radius: 50%;
+    background: #3b82f6;
+    cursor: pointer;
+    border: 2px solid #1e40af;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  }
 }
 
 /* Custom scrollbar */
