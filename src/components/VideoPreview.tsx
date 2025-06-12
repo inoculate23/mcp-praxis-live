@@ -8,7 +8,7 @@ interface VideoPreviewProps {
 }
 
 export const VideoPreview: React.FC<VideoPreviewProps> = ({ 
-  videoSrc = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4", 
+  videoSrc = "https://nfv.mos.us-south-1.sufybkt.com/comp.mp4?expires=1749706547&token=Dwib5SXqZIfXp7beRIzLkb6gH8pQQkTj_WlnIVAO:CmySNxCXJ4HsDStHOzItcLdv-Sg=", 
   title,
   className = ""
 }) => {
